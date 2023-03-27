@@ -5,7 +5,7 @@
             <!-- <div class="line"></div> -->
             <div class="now-week">
                 <p>{{nowWeek}}&nbsp;</p>
-                <p>{{nowDate}}</p>
+                <p>{{nowDate}}123</p>
             </div>
         </div>
         <!-- <div :class="[{'changeStyle':!currentRoute},'head-portrait-style']">

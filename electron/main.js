@@ -1,40 +1,127 @@
 // 控制应用生命周期和创建原生浏览器窗口的模组
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, dialog } = require('electron')
+const { autoUpdater } = require('electron-updater')
+const isDev = require('electron-is-dev')
 const path = require('path')
+// Object.defineProperty(app, 'isPackaged', {
+//   get() {
+//     return true;
+//   }
+// })
 
-const NODE_ENV = process.env.NODE_ENV
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
-function createWindow () {
+function createWindow() {
   // 创建浏览器窗口
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: path.join(__dirname, '../public/xajd.ico'),
     // autoHideMenuBar: true, //隐藏菜单
+    // fullscreen: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      webSecurity: false
+      webSecurity: false,
+      // enableRemoteModule: true, 
     }
-  })
+  }) 
 
   // 加载 index.html
   // mainWindow.loadFile('dist/index.html') 将该行改为下面这一行，加载url
-  mainWindow.loadURL(
-    NODE_ENV === 'development'
-      ? 'http://localhost:3000/'
-      :`file://${path.join(__dirname, '../dist/index.html')}`
-  );
-
+  mainWindow.loadURL(isDev? 'http://localhost:3000/': `file://${path.join(__dirname, '../dist/index.html')}`);
+ 
   // 打开开发工具
-//   if (NODE_ENV === "development") {
-    mainWindow.webContents.openDevTools()
-//   }
+    // if (isDev) {
+    //   mainWindow.webContents.openDevTools()
+    // }
 
 }
-
+const returnData = {
+  error: { status: -1, msg: '检测更新查询异常' },
+  checking: { status: 0, msg: '正在检查应用程序更新' },
+  updateAva: { status: 1, msg: '检测到新版本，正在下载,请稍后' },
+  updateNotAva: { status: -1, msg: '您现在使用的版本为最新版本,无需更新!' },
+};
 // 这段程序将会在 Electron 结束初始化
 // 和创建浏览器窗口的时候调用
-// 部分 API 在 ready 事件触发后才能使用。
+// 部分 API 在 ready 事件触发后才能使用。GH_TOKEN   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
 app.whenReady().then(() => {
+  // autoUpdater.requestHeaders = { "Private-Token":  "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" }
+  // autoUpdater.requestHeaders = { "GH_TOKEN":  "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" }
+  // autoUpdater.setFeedUrl('https://github.com/baichengda/znds.git')
+  if(isDev) {
+    autoUpdater.updateConfigPath = path.join( __dirname ,'../dev-app-update.yml')
+  }
+    
+  autoUpdater.autoDownload = false
+  // autoUpdater.checkForUpdatesAndNotify()
+  autoUpdater.checkForUpdates()
+  console.log('检查中',isDev)  
+  // dialog.showMessageBox('错误') 
+  autoUpdater.on('error', (error) => {
+    // dialog.showErrorBox('错误')  
+
+  }) 
+
+  //更新错误
+  autoUpdater.on('error', function (error) {
+
+    dialog.showErrorBox(error)
+  });
+  //检查中
+  autoUpdater.on('checking-for-update', function () {
+    // dialog.showMessageBox('正在检查应用程序更新') 
+    console.log('正在检查应用程序更新')
+  });
+  
+  // dialog.showErrorBox('发现新版本')
+  //发现新版本
+  autoUpdater.on('update-available', function (info) {
+    // dialog.showMessageBox('发现新版本')
+    console.log('发现新版本')
+    if (!isDev) {
+      // dialog.showErrorBox(returnData.updateAva)
+      // dialog.showErrorBox('发现新版本')
+    } else {
+      // dialog.showErrorBox(returnData.updateNotAva)
+      // dialog.showErrorBox('发现新版本')
+    }
+    // dialog.showMessageBox({
+    //   type: "info",
+    //   title: '应用有新的版本',
+    //   message: '发现新的版本，是否更新',
+    //   buttons: ['是','否']
+    // },(buttonIndex) => {
+    //   if(buttonIndex===0) {
+    //     autoUpdater.downloadUpdate()
+    //   }
+    // })
+  });
+
+  //当前版本为最新版本
+  autoUpdater.on('update-not-available', function (info) {
+    // dialog.showMessageBox('当前版本为最新版本')
+    console.log('当前版本为最新版本')
+    setTimeout(function () {
+      // hotUpdate();//热更新检查
+      // dialog.showErrorBox(returnData.updateNotAva)
+    }, 1000);
+  });
+
+  // 更新下载进度事件
+  autoUpdater.on('download-progress', function (progressObj) {
+    // win.webContents.send('updateAppProgress', progressObj)
+
+  });
+
+
+  autoUpdater.on('update-downloaded', function (event, releaseNotes, releaseName, releaseDate, updateUrl, quitAndUpdate) {
+    console.log('下载')
+    // win.webContents.send('isUpdateNow',"isUpdateNow")
+  });
+
+
+
+
   createWindow()
 
   app.on('activate', function () {

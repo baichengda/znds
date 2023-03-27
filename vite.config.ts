@@ -20,21 +20,21 @@ export default defineConfig({
   //   outDir: 'XJDzhinengdaoshi',
   // },
   // server: {
-  //   port: 4001,
+  //   port: 4003,
   //   host: '0.0.0.0',
   //   open: false, //设置服务器启动自动打开浏览器
   //   cors: true, //允许跨域
-  //   proxy: {
-  //     '/api': {
-  //       target: '',
-  //       changeOrigin: true,
-  //       secure: false,
-  //       rewrite: (path) => path.replace('/api/','/')
-  //     }
-  //   },
+    // proxy: {
+    //   '/api': {
+    //     target: '',
+    //     changeOrigin: true,
+    //     secure: false,
+    //     rewrite: (path) => path.replace('/api/','/')
+    //   }
+    // },
     
   // },
   // preview: {
-  //   port: 5000
+  //   port: 3001
   // }
 })

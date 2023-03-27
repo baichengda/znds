@@ -20,7 +20,7 @@
         
     </div>
     <div class="goback" @click="goBack">
-        返回
+        返回13
     </div>
     <carousels ref="carousel"/>
 </template>
