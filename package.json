@@ -1,10 +1,9 @@
 {
-  "name": "my-app",
+  "name": "dn_znds",
   "private": true,
   "version": "1.0.0",
   "main": "electron/main.js",
   "description": "test",
-  "repository": "https://github.com/baichengda/znds",
   "author": {
     "name": "bai",
     "email": "bcd@dnyuntu.com"
@@ -13,26 +12,34 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "electron": "wait-on http://localhost:3000 && electron .",
+    "electron": "wait-on tcp:3000 && electron .",
     "electron:server": "concurrently -k \"npm run dev\" \"npm run electron\"",
     "electron:builder": "vite build && electron-builder ",
-    
-    "electron:generate-icons":"electron-icon-builder --input=./public/person.png --output=./image --flatten"
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "release": "cross-env GH_TOKEN=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 electron-builder",
+    "prerelease": "npm run build",
+    "electron:generate-icons": "electron-icon-builder --input=./public/person.png --output=./image --flatten"
   },
-  "publish": ["github"],
+  "publish": [
+    {
+      "provider": "generic",
+      "url": "http://81.70.44.15/"
+    }
+  ],
   "build": {
     "appId": "com.dnyuntu.znds",
-    "productName": "智能导视3",
+    "productName": "znds",
     "copyright": "Copyright © 2023 ${author}",
     "mac": {
       "artifactName": "${productName}_${version}.${ext}",
-      "category":"public.app-category.productivity",
+      "category": "public.app-category.productivity",
       "target": [
         "dmg"
       ]
     },
     "dmg": {
-      "background":"",
+      "background": "",
       "contents": [
         {
           "x": 410,
@@ -48,7 +55,7 @@
       ]
     },
     "win": {
-      "icon":"image/icons/icon.icns",
+      "icon": "image/icons/icon.icns",
       "requestedExecutionLevel": "highestAvailable",
       "target": [
         {
@@ -62,7 +69,7 @@
     },
     "nsis": {
       "oneClick": false,
-      "perMachine": false,
+      "perMachine": true,
       "allowToChangeInstallationDirectory": true,
       "deleteAppDataOnUninstall": true,
       "installerIcon": "image/icons/icon.ico",
@@ -70,23 +77,25 @@
       "installerHeaderIcon": "image/icons/icon.ico",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "智能导视3"
+      "shortcutName": "znds"
     },
-    "squirrelWindows":{
-      "loadingGif":"",
-      "iconUrl":""
+    "squirrelWindows": {
+      "loadingGif": "",
+      "iconUrl": ""
     },
     "linux": {
       "target": {
         "target": "AppImage",
-        "arch": ["x64"]
+        "arch": [
+          "x64"
+        ]
       },
       "icon": "",
       "maintainer": "bai",
       "description": ""
     },
     "files": [
-      "dist/**/*",
+      "ZNDS/**/*",
       "electron/**/*"
     ],
     "directories": {
@@ -95,16 +104,22 @@
     }
   },
   "dependencies": {
+    "electron-is-dev": "^2.0.0",
     "electron-updater": "^5.3.0",
-    "electron-is-dev": "^2.0.0"
+    "vite-plugin-require-transform": "^1.0.12",
+    "3d-force-graph": "^1.67.6",
+    "d3": "^6.2.0",
+    "d3-context-menu": "^1.1.2",
+    "three-spritetext": "^1.5.3"
   },
   "devDependencies": {
     "@element-plus/icons-vue": "^2.0.6",
     "@types/jquery": "^3.5.14",
     "@types/node": "^18.0.6",
     "@vitejs/plugin-vue": "^2.3.3",
+    "@vueuse/electron": "^9.13.0",
     "autoprefixer": "^10.4.7",
-    "axios": "^0.27.2",
+    "axios": "^1.3.4",
     "concurrently": "^7.6.0",
     "cross-env": "^7.0.3",
     "crypto-js": "^4.1.1",
@@ -125,9 +140,11 @@
     "tslib": "^2.4.0",
     "typescript": "^4.5.4",
     "vite": "^2.9.9",
+    "vite-plugin-electron": "^0.11.1",
+    "vite-plugin-electron-renderer": "^0.13.12",
     "vue": "^3.2.25",
     "vue-router": "^4.1.1",
     "vue-tsc": "^0.34.7",
-    "wait-on": "^7.0.1"
+    "wait-on": "^6.0.1"
   }
 }

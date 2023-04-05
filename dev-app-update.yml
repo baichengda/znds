@@ -1,3 +1,11 @@
-owner: baichengda
-repo: znds
-provider: github
+# owner: baichengda
+# repo: znds
+# provider: github
+version: 1.0.1
+files:
+  - url: znds_1.0.0.exe
+    sha512: wmGC6fGpe8qeAeL2fq7blNH21we2lbktGvGqIcMo0t3ol1mfa4vjNNkFYIu+ibXodKDq/ogMMSuD6UXdQvnlvQ==
+    size: 101973263
+path: znds_1.0.0.exe
+sha512: wmGC6fGpe8qeAeL2fq7blNH21we2lbktGvGqIcMo0t3ol1mfa4vjNNkFYIu+ibXodKDq/ogMMSuD6UXdQvnlvQ==
+# sha512: W0azmEMqslb6p246gxJVi3XATg/CURzxvN2Slw5pA+SCuMl0hcI5VC870PCfBDoSJh2bCPTiXDY9K2ESxcZpDg==

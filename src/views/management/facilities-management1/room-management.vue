@@ -227,7 +227,7 @@ export default {
   methods: {
     initWebSocket(){ //初始化weosocket
       const wsuri = this.$ws;
-      this.websock = new WebSocket(wsuri);
+      this.websock = new WebSocket('ws://' + wsuri);
     },
     open() {
       this.websock.onmessage = this.websocketonmessage;

@@ -1,31 +1,98 @@
 import { createRouter, createWebHistory,createWebHashHistory, RouteRecordRaw} from 'vue-router'
+import { defineAsyncComponent, h } from "vue"
 
 const routes:Array<RouteRecordRaw> = [
-    {        
-        name: "login",
-        path: "/login",
-        components:  {            
-            default: () => import ('@/views/login/index.vue'),
+    // {
+    //     name: "login",
+    //     path: "/login",
+    //     components: {
+    //         default: () => import ('@/views/login/index.vue'),
+    //     },
+    //     meta: {
+    //         title: '登录',
+    //     },
+    // },
+    {
+        name: "floorOverview",
+        path: "/floor-overview",
+        components: {
+            default: () => import ('@/views/floor-overview/index.vue'),
+            bimModel: () => import('@/views/bim-model/index.vue'),
+            // filterNav: () => import('@/views/floor-nav/index.vue')
         },
-        meta:  {            
-            title: '登录',
+        meta: {
+            title: '楼层概览',
         },
     },
-    {        
-        name: "monitoringCenter",
-        path: "/monitoring-center",
-        components:  {            
-            default: () => import ('@/views/monitoring-center/index.vue'),
+    {
+        name: "personnelQuery",
+        path: "/personnel-query",
+        components: {
+            default: () => import ('@/views/personnel-query/index.vue'),
             bimModel: () => import('@/views/bim-model/index.vue'),
-            filterNav: () => import('@/views/side-nav/filter-nav.vue')
         },
-        meta:  {            
-            title: '监控中心',
+        meta: {
+            title: '人员查询',
+        },
+    },
+    {
+        name: "instrumentQuery",
+        path: "/instrument-query",
+        components: {
+            default: () => import ('@/views/instrument-query/index.vue'),
+            bimModel: () => import('@/views/bim-model/index.vue'),
+        },
+        meta: {
+            title: '仪器查询',
+        },
+    },
+    {
+        name: "instrumentDetails",
+        path: "/instrument-details",
+        components: {
+            default: () => import('@/views/instrument-details/index.vue'),
+            bimModel: () => import('@/views/bim-model/index.vue'),
+        },
+        meta: {
+            title: '仪器详情',
+        },
+    },
+    {
+        name: "personnelDetails",
+        path: "/personnel-details",
+        components: {
+            default: () => import('@/views/personnel-details/index.vue'),
+            bimModel: () => import('@/views/bim-model/index.vue'),
+        },
+        meta: {
+            title: '人员详情',
+        },
+    },
+    {
+        name: "relationshipsMap",
+        path: "/relationships-map",
+        components: {
+            default: () => import('@/views/relationships-map/index.vue'),
+            bimModel: () => import('@/views/bim-model/index.vue'),
+        },
+        meta: {
+            title: '关系图谱',
+        },
+    },
+    {
+        name: "screenSaver",
+        path: "/screen-saver",
+        components: {
+            default: () => import('@/views/screen-saver/index.vue'),
+            bimModel: () => import('@/views/bim-model/index.vue'),
+        },
+        meta: {
+            title: '关系图谱',
         },
     },
     {
         path: '/',
-        redirect: '/monitoring-center'
+        redirect: '/screen-saver',
     },
 ]
 // import.meta.env.BASE_URL
@@ -34,17 +101,4 @@ const router = createRouter({
     routes
 })
 
-// router.beforeEach((to, from, next) => {
-//     let is = true;
-//     let userId = localStorage.getItem('user_id');
-//     //获取用户信息，判断是否已登录
-//     if (userId || to.path == '/login') {
-//         next(); //表示已经登录(扫描二维码查看设备信息不需要验证)
-//     } else {
-//         //未登录
-//         next({
-//             name: "login",
-//         });
-//     }
-// })
 export default router

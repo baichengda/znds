@@ -89,32 +89,34 @@ class personnelPosition extends Autodesk.Viewing.Extension {
             // we need to collect all the fragIds for a given dbId
             const icon = value[i];
             let userId = icon.USER_ID
-            let userName = icon.USER_NAME
+            let userName = icon.USER_NAME || icon.user.userName
             let floor = icon.MAP_ID
             let position = icon.POSITION
             let color = icon.COLOR
             this._frags1['dbId' + userId] = []
                 // create the label for the dbId class="room-real-data"
+                // 顶部名字部分,图标顶部名字\名字\名字\名字名字名字
+                // <div style="
+                //             color: #fff;
+                //             position: absolute;
+                //             top: -20px; 
+                //             left: 50%;
+                //             width: auto;
+                //             white-space: nowrap;
+                //             height: 20px;
+                //             line-height: 20px;
+                //             border-radius: 4px;
+                //             padding: 0 6px;
+                //             transform: translateX(-50%);
+                //             background-color:${color || '#00d5f6'}"
+                //         >${userName}<div></div>
             if (icon) {
                 var $label = $(`
                     <label class="markup position-update" data-floor="${floor}" id="${floor}-${userId}" data-id="${userId}" data-pos='${position}'>
-                        <div class="content" style="background-color:${color || 'rgb(218 14 14)'};">
-                            <span style="background: #fff;display: inline-block;width: 0.5625rem;height: 0.5625rem;border-radius: 50%"></span>
+                        <div class="content" style="background-color:${color || '#00d5f6'};">
+                            <span style="background: #00d5f6;color: #fff;transform: rotate(45deg);display: inline-block;width: 1rem;height: 1rem;line-height: 1rem;border-radius: 50%">${userName && userName.split('')[0]}</span>
                         </div>
-                        <div style="
-                            color: #fff;
-                            position: absolute;
-                            top: -20px; 
-                            left: 50%;
-                            width: auto;
-                            white-space: nowrap;
-                            height: 20px;
-                            line-height: 20px;
-                            border-radius: 4px;
-                            padding: 0 6px;
-                            transform: translateX(-50%);
-                            background-color:${color || 'rgb(218 14 14)'}"
-                        >${userName}<div>
+                        
                     </label>
                 `);
                 // $connectVariablelabel.css('display', this.viewer.isNodeVisible(dbid) ? 'block' : 'none');

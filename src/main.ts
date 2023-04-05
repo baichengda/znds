@@ -12,20 +12,11 @@ import '@/common/rem.js';
 const app = createApp(App)
 app.config.globalProperties.publicPath = import.meta.env.BASE_URL
 
-// let host = window.location.host
-let host = '192.168.31.233'
-
-app.config.globalProperties.$ws = `ws://${host}:9022`;
-app.config.globalProperties.$baseURL = `http://${host}:9022/`;
-app.config.globalProperties.loadPortURL = '9022';
-app.config.globalProperties.portURL = '9022/';
+app.config.globalProperties.$ws = window.isEnablePenetrationMode ? '/ws/9022/' : `${window.PROJECT_URL}:9022`;
+app.config.globalProperties.$baseURL = window.isEnablePenetrationMode ? '/api/9022/' : `http://${window.PROJECT_URL}:9022/`;
+app.config.globalProperties.loadPortURL = window.isEnablePenetrationMode ? '9527/9022': '9022';
+app.config.globalProperties.portURL = window.isEnablePenetrationMode ? '9527/9022/' : '9022/';
 console.log(process.env.NODE_ENV,import.meta.env.BASE_URL)
-
-// app.config.globalProperties.$ws = 'ws://192.168.31.233:9022';
-// app.config.globalProperties.$baseURL = 'http://192.168.31.233:9022/';
-// app.config.globalProperties.loadPortURL = '9022';
-// app.config.globalProperties.portURL = '9022/';
-
 
 
 sessionStorage.setItem("appData", JSON.stringify(app.config.globalProperties))

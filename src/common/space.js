@@ -28,7 +28,7 @@ export function clickNavShowRoomIcon(data) {
         icons: data?.children || [],
         onClick: (dbid, name, roomId) => {
             // window.yst_viewer.impl.selector.setSelection([dbid], window['models'+data.modelId]);
-            window.yst_viewer.clearSelection()
+            window.yst_viewer?.clearSelection()
             goFitToView([dbid],data.modelId)
             selectModelArtifacts([dbid],data.modelId)
 //             window.yst_viewer?.fitToView([dbid], window['models' + data.modelId]);

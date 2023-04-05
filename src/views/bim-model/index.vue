@@ -1,6 +1,6 @@
 <template>
     <div class="model-content">
-        <div id="viewer-local">
+        <div id="viewer-local" v-once>
         </div>
         <!-- <div @click="personPath" style="position: absolute;top: 20%;left: 50%;z-index:999">sdasdsadasdsadsad</div>
         <div @click="removeScene" style="position: absolute;top: 30%;left: 50%;z-index:999">删除</div> -->
@@ -11,13 +11,15 @@
 </template>
 <script setup lang="ts">
 import { onMounted, watch, ref, getCurrentInstance,reactive } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute ,useRouter} from 'vue-router'
 import emitter from '@/common/mybus.ts'
 import { defaultView, buildModelTree, showAllModel, goHideRoomMask, setModelOpacity } from '@/common/bim-utils.js'
+import { getModalCameraAngle } from '@/views/floor-nav/nav-utils.js'
 import '@/assets/js/index.js'
 import {http,personnelPositionApi} from '@/common/request.js'
 import { onModelLoaded, wsdPos, updataHot } from './hot.js'
 import { ElMessage } from 'element-plus'
+import { clickNavShowRoomIcon } from '@/common/space.js'
 
 let { appContext } = getCurrentInstance() as any
 
@@ -56,64 +58,6 @@ let upZ = null
 let angle = {}
 let CustomToolExtension = {}
 
-watch(() => path, () => {
-    routerChange()
-})
-// let postionInfo = [
-//     {name:1 ,pos:{x: -4.439651432683625, y: 36.191368888933496, z: -4.183071136474609}},
-//     {name:2 ,pos:{x: -4.332670217767074, y: 36.43417932924389, z: -4.183071136474609}},
-//     {name:3 ,pos:{x: -4.282847288176086, y: 36.7988220889918, z: -4.183071136474609}},
-//     {name:4 ,pos:{x: -4.233024358585098, y: 37.16346484873968, z: -4.183071136474624}},
-//     {name:5 ,pos:{x: -4.183201428994096, y: 37.52810760848758, z: -4.183071136474609}},
-//     {name:6 ,pos:{x: -4.169038904375306, y: 37.811813554798675, z: -4.183071136474624}},
-//     {name:7 ,pos:{x: -4.269192950407621, y: 38.33918413998476, z: -4.183071136474624}},
-//     {name:8 ,pos:{x: -3.8397435301903755, y: 35.54045758718077, z: -4.183071136474624}},
-//     {name:9 ,pos:{x: -3.4816149199175044, y: 32.579857407503155, z: -4.183071136474609}},
-//     {name:0 ,pos:{x: -3.3584384329807904, y: 28.079749375397295, z: -4.183071136474609}},
-//     {name:11 ,pos:{x: -3.6358781301733742, y: 25.689123684035625, z: -4.183071136474609}},
-//     {name:12 ,pos:{x: -3.520545185821568, y: 22.932146835796914, z: -4.183071136474609}},
-//     {name:13 ,pos:{x: -3.312393551172015, y: 20.134274481557483, z: -4.183071136474624}},
-//     {name:14 ,pos:{x: -3.4891710154819364, y: 15.959622100327898, z: -4.183071136474624}},
-//     {name:15 ,pos:{x: -3.0953820002368744, y: 13.079958734087096, z: -4.183071136474609}},
-//     {name: 16,pos:{x: 2.696162402629857, y: 12.364553696174376, z: 1.2545935593417141}},
-    
-// ]
-//人员轨迹测试数据
-let currPoints = [{
-    x: '-47.0178685072175',
-    y: '-9.964306134109606',
-    z: '-44.70144271850583'
-},
-{
-    x: '-42.7566894664308',
-    y: '-9.445532415197462',
-    z: '-44.70144271850583'
-},
-{
-    x: '-39.56611315211305',
-    y: '-9.414132865540125',
-    z: '-44.70144271850586'
-},
-{
-    x: '-34.77494071436416',
-    y: '-9.009352801527356',
-    z: '-44.70144271850586'
-},
-{
-    x: '-28.844143544941787',
-    y: '-8.392195701599121',
-    z: '-37.199326784323546'
-},
-{
-    x: '-17.45968652145018',
-    y: '-8.392195701599121',
-    z: '-38.27553591252018'
-},
-{
-    x: '-5.206510032777587',
-    y: '-10.943603803428275',
-    z: '-44.70144271850583'
-}]
 onMounted(() => {
     //测试
     // $('#viewer-local').on('click', function(ev) {
@@ -227,91 +171,28 @@ onMounted(() => {
         removeScene()
     })
 })
-// let i=0
-// let timer = setInterval(() => {
-//         let arr = []
-//         if(i>=postionInfo.length-1) {
-//             i=0
-//         }else{
-//             i++
-//         }
-//         arr.push(postionInfo[i])
-//         window.personnelPosition?.showLabel(arr)
-//     },2000)
-
-// [
-//     { position:"1,2,3"},
-//     { position:"4,5,6"},
-//     { position:"7,8,9"
-// ]
 //获取人员轨迹
-let getPersonPath = (userId,floorName) => {
-    removeScene()
-    let formData = new FormData()
-    formData.append("mapId",floorName)
-    formData.append("userId",userId)
-    personnelPositionApi.post('Position/getposition', formData).then( res => {
-        let { message,code,data } = res.data
-        if(code === 200) {
-            if(data && data.length>1) {
-                personPath(data)
-            }else{
-                ElMessage.error('此人员暂无轨迹')
-            }
-            
-        }
-        
-    })
-}
-// let routerChange = () => {
-//     setTimeout(() => {
-//         let intersections = [];
-//         const bounds = document.getElementById('viewer-local').getBoundingClientRect();
-//         let arr = [
-//             // {name: 16,pos:{x: 2.696162402629857, y: 12.364553696174376, z: 1.2545935593417141}},
-//             // {name: 15,pos:{x: -0.5946180979410798, y: -0.8105495913515333, z: 1}},
-//             // {name: 14,pos:{x: -0.5234375, y: -2.12059765208111, z: 1}}, //3F
-//             // {name: 13,pos:{x: 790.9887709767523, y: -369.0287617490848, z: 1}} //2F
-//             {
-//                 modelId: "1",
-//                 MAP_ID: "F01",
-//                 POSITION: "-111.71173858642578,-24.163145065307617,-33.218502044677734",
-//                 USER_ID: "5",
-//                 COLOR: "orange",
-//                 USER_NAME:"白"
-//             },
-//             {
-//                 modelId: "1",
-//                 MAP_ID: "F01",
-//                 POSITION: "-93.86566162109375,-24.564266204833984,-33.218502044677734",
-//                 USER_ID: "6",
-//                 COLOR: "orange",
-//                 USER_NAME:"白"
+// let getPersonPath = (userId,floorName) => {
+//     removeScene()
+//     let formData = new FormData()
+//     formData.append("mapId",floorName)
+//     formData.append("userId",userId)
+//     personnelPositionApi.post('Position/getLocus', formData).then( res => {
+//         let { message,code,data } = res.data
+//         if(code === 200) {
+//             if(data && data.length>1) {
+//                 personPath(data)
+//             }else{
+//                 ElMessage.error('此人员暂无轨迹')
 //             }
-//             ]
-//         // window.yst_viewer.impl.castRayViewport( window.yst_viewer.impl.clientToViewport(389.77518248175333333333333333 - bounds.left, 693.43216623032333333333333333 - bounds.top), false, null, null, intersections)
-//         // console.log(window.yst_viewer.impl.clientToViewport(388.66662597656333333333333333-bounds.left,847.7424835481933333333333333- bounds.top))
-//         // let aa = window.yst_viewer.clientToWorld(684/2, 252/2, false)
-//         // let aa = window.yst_viewer.worldToClient(new THREE.Vector3(684 / 2, 252 / 2, 1))
-//         // let aa = window.yst_viewer.worldToClient(new THREE.Vector3(388.66662597656333333333333333 / 2, 847.7424835481933333333333333 / 2, 1));
-//         // console.log(aa)
-//         window.personnelPosition?.showLabel(arr)
-//         console.log(window.personnelPosition)
-//     },10000)
-    
-    
+            
+//         }
+        
+//     })
 // }
-// routerChange()
 
-
-let preservation = () => {
-    
-}
 
 let default1 = () => {
-    let formData = new FormData();
-    // formData.append('companyName','ZSH');
-    // formData.append('projectName','runhuayou');
     http.get("model/modelDefault",{headers: { "Content-Type": "application/json" },
         }).then((res) => {
             var tabledata = res.data.data.list;
@@ -388,6 +269,106 @@ let globalPromise = (viewer, modelArray, success, error, jz_url) => {
 let onLoadError = () => {
 
 }
+const router = useRouter()
+//改变模型尺寸
+let newWidth = ref("100%") as any;
+let newHeight = ref("100%") as any;
+const resizeViewer = () => {
+    if(!(window as any).yst_viewer) return
+        // let value = event;
+        let viewer = (window as any).yst_viewer
+        let viewWindow = (window as any).yst_viewer.clientContainer;
+        
+
+        viewWindow.style.width = `${(newWidth.value)}px`;
+        viewWindow.style.height = `${(newHeight.value)}px`;
+
+
+        viewer.canvas.width = newWidth.value;
+        viewer.canvas.height = newHeight.value;
+
+
+        viewer.container.style.width = `${(newWidth.value)}px`;
+        viewer.container.style.height = `${(newHeight.value)}px`;
+        viewer.resize(newWidth.value, newHeight.value);
+        viewer.impl.invalidate(true, true, true)
+}
+//改变模型尺寸
+const changeModelSize = (domname) => {
+    newHeight.value = $(domname).height() || newHeight.value
+    newWidth.value = $(domname).width() || newWidth.value
+    resizeViewer()
+}
+
+//监听页面变化
+window.addEventListener('resize', () => {
+    if(router.currentRoute.value.name=='instrumentDetails'|| router.currentRoute.value.name=='personnelDetails') {
+        changeModelSize('.right-module')
+    }else{
+        changeModelSize('#app')
+    }
+    
+})
+
+let Conduit = ref(true)
+let conduitDbids = ref([])
+let uselessmodelId = ref('')
+//隐藏显示管道
+let hideConduit = () => {
+    var instanceTree = window['models' + uselessmodelId.value]?.getData().instanceTree.nodeAccess.dbIdToIndex;
+    let arr = [];
+    for (var key in instanceTree) {
+        arr.push(Number(key))
+    }
+    if (Conduit.value) {
+        //显示所有
+        arr.forEach(item => {
+            window['models' + uselessmodelId.value]?.visibilityManager?.setNodeOff(item, false);//使用此方法将构件彻底隐藏，单独再将其设置为false，才能显示
+        })
+        conduitDbids.value.forEach(item => {
+            window['models' + uselessmodelId.value]?.visibilityManager?.setNodeOff(item, false);//使用此方法将构件彻底隐藏，单独再将其设置为false，才能显示
+        })
+    } else {
+        //隐藏，只隐藏管道，先隐藏全部，再把所有设备显示
+        arr.forEach(item => {
+            window['models' + uselessmodelId.value]?.visibilityManager?.setNodeOff(item, true);//使用此方法将构件彻底隐藏，单独再将其设置为true，才能隐藏
+        })
+        conduitDbids.value.forEach(item => {
+            window['models' + uselessmodelId.value]?.visibilityManager?.setNodeOff(item, false);//使用此方法将构件彻底隐藏，单独再将其设置为false，才能显示
+        })
+    }
+}
+// 监听路由变化
+watch(() => router.currentRoute.value.name,(newValue, oldValue) => {
+    showAllModel()
+    emitter.emit('showAll')
+    Conduit.value = true
+    hideConduit()
+    if(newValue=='instrumentDetails' || newValue=='personnelDetails') {
+        setTimeout(() => {
+            $('.model-content').addClass('detailsStyle')
+            changeModelSize('.right-module')
+        },0)
+    }else{
+        $('.model-content').removeClass('detailsStyle')
+        changeModelSize('#app')
+    }
+    getModalCameraAngle()
+    clickNavShowRoomIcon([])
+},{ immediate: true });
+
+
+
+emitter.on('theConduit',(e) => {
+    if(e?.data != null){
+        Conduit.value = e.item;//显示管道
+        conduitDbids.value = e.data.useless;//管道的dbids
+        uselessmodelId.value = e.data.uselessModelId || e.data.modelId;
+        hideConduit();
+    }
+})
+
+
 
 let onLoadSuccess = () => {
     console.log('load JZ success')
@@ -413,6 +394,8 @@ let onLoadSuccess = () => {
             }      
          },500)
     });
+    
+
     viewer.addEventListener(
         Autodesk.Viewing.AGGREGATE_SELECTION_CHANGED_EVENT, //!<<<< 事件名称
         (event) => { //!<<<< 回调函数（匿名函数）
@@ -434,49 +417,24 @@ let onLoadSuccess = () => {
             // noMepModel.value.forEach( item => {
             //     window['models'+item.modelId]?.setAllVisibility(false);
             // })
-
+            
             // setModelOpacity()
             viewer.impl.toggleGhosting(false)
             //加载扩展
             try {
+                resizeViewer()
+                //静态标签
+                window.staticIcon = await viewer?.loadExtension("staticLabel")
                 //人员定位
                 window.personnelPosition = await viewer?.loadExtension('personnelPosition')
-                //点击标签，显示当前人员轨迹
-                if(window.personnelPosition) {
-                    window.personnelPosition.onClick = (userId,floorName) => {
-                        getPersonPath(userId,floorName)
-                    }
-                }
-                // let roomData = [
-                //     {
-                //         objectId: "65",
-                //         fdList: [
-                //             [
 
-                //             ]
-                //         ]
+                
+            
+                // window.staticIcon?.onClick = (dbId,modelId) => {
+                //     if(this.$route.name === 'modelConnection') {
+                //         emitter('labelCofig',{dbId,modelId})
                 //     }
-                // ]
-                // setInterval(async() => {
-                //     //实时数据
-                //     let val = [
-                //         {dbId:1393,value: Math.random()},
-                //         {dbId:1392,value: Math.random()},
-                //         {dbId:2876,value: Math.random()}
-                //     ];
-
-
-                //     let deviceDbid = val.map(item => item.dbId)
-                //     let realData = val.map(item => item.value)
-                //     // 房间
-                //     let roomId = [65,47,146,55]
-                //     onModelLoaded(roomId)
-                //     console.log(deviceDbid)
-                //     let device = await wsdPos(deviceDbid)
-                //         console.log(device)
-                    
-                //     updataHot(realData)
-                // },5000)
+                // }
                 
             } catch (ex) {
 
@@ -484,6 +442,8 @@ let onLoadSuccess = () => {
             goHideRoomMask()
             // 模型加载完后，需要知道现在模型属于平移还是旋转状态
             emitter.emit('currModelStatue')
+            //模型加载完成
+            emitter.emit('modelLoaded')
         }
     );
     let h = 0;//如果有多个同类模型时需要在加载一遍,建筑不需要，优先上传建筑
@@ -551,7 +511,6 @@ let onLoadSuccess = () => {
             } else {
                 menu.length = 0
             }
-
 
         }
     );
@@ -635,7 +594,6 @@ let onLoadSuccess = () => {
             let modelId = splitUrl[splitUrl.length - 2]
             modelId = modelId;
             let dbId = result?.dbId || null
-
             if (dbId != null && e.button != 2) { //event.button != 2右击鼠标不请求
                 window.dispatchEvent(
                     new CustomEvent('db_id', { 'detail': { dbId, modelId } })
@@ -656,7 +614,7 @@ let onLoadSuccess = () => {
 
     // Autodesk.Viewing.Extension.call(this, viewer);
     // defaultView(viewer);
-    preservation();
+    // preservation();
     // if(name == 'realMonitoring'){
     // viewer.setBackgroundColor(237,241,244,237,241,244);
     // }else{
@@ -664,7 +622,7 @@ let onLoadSuccess = () => {
     // }
     //设置forge透明度
     // Autodesk.Viewing.Private.InitParametersSetting.alpha=true;//加载模型成功前设置
-    viewer.setEnvMapBackground(true);
+    viewer.setEnvMapBackground(false);
     viewer.impl.renderer().setClearAlpha(0); //clear alpha channel
     // viewer.impl.glrenderer().setClearColor( 0xffffff, 0 ) //可以不设置
     // viewer.impl.invalidate(true) //可以不设置
@@ -675,7 +633,7 @@ let onLoadSuccess = () => {
     viewer.impl.setDisplayEdges(false);
 
     setTimeout(() => {
-        viewer.setGroundShadow(true);
+        viewer.setGroundShadow(false);
         if (
             name == "monitoringCenter" ||
             name == "driving"
@@ -685,27 +643,6 @@ let onLoadSuccess = () => {
             viewer.setActiveNavigationTool("");
         }
     }, 1000);
-}
-let cutPlanView = () => {
-    viewer.autocam.goToView({
-        position: new THREE.Vector3(
-            -34.004335487593956, -114.33533236339532, 112.46310571561423,
-        ), //!<<< 相机的新位置
-        up: new THREE.Vector3(
-            0.313057877414841,
-            0.5482889262086771,
-            0.7754830873626132
-        ),
-        center: new THREE.Vector3(
-            24.440311684430796,
-            -13.129708349333406,
-            17.314054357412154
-        ), //!<<< 相机的新焦点
-        pivot: new THREE.Vector3(0, 0, 0), //!<<< 相机的新环绕（Orbit）中心
-        fov: 53.13010235415598,
-        worldUp: new THREE.Vector3(0, 0, 1),
-        isOrtho: true,
-    });
 }
 //测试线生成后期可删
 let currentMesh = null
@@ -774,11 +711,13 @@ html {
 .model-content {
     width: 100%;
     height: 100%;
+    position: absolute;
+    top: 0
 }
 #viewer-local {
     // z-index: -1;
     position: absolute;
-    // top: 0;
+    top: 0;
     // left:0;
     width: 100%;
     height: 100%;
@@ -884,6 +823,9 @@ div[data-i18n="Pivot"] {
 .adsk-viewing-viewer {
     background: transparent !important;
     z-index: -3;
+}
+label.staticLabel {
+  position: absolute;
 }
 label.position-update {
     position: absolute;
@@ -1056,5 +998,13 @@ label.showRoomIcon-markup {
     margin: 0 auto;
     border-bottom-right-radius: 100%;
     border-bottom-left-radius: 100%;
+}
+
+//详情页样式
+.detailsStyle {
+    #viewer-local {
+        right: 20px;
+        top: 106px;
+    }
 }
 </style>

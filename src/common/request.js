@@ -1,11 +1,12 @@
 import axios from 'axios'
-
+import { ElLoading } from 'element-plus'
 
 //请求拦截器 
 axios.interceptors.request.use((config) => {
         // 每次发送请求之前判断是否存在token，如果存在，则统一在http请求的header都加上token，不用每次请求都手动添加了
         const token = window.localStorage.getItem('token');
         token && (config.headers.Authorization = token)
+        console.log(333333)
             //若请求方式为post，则将data参数转为JSON字符串
         if (config.method === 'POST') {
             config.data = JSON.stringify(config.data);
@@ -64,41 +65,67 @@ axios.interceptors.response.use((response) => {
     return Promise.reject(error);
 });
 
-// let host = window.location.hostname
+
+axios.defaults.headers.common['Authorization1'] = 1
+// let host = window.location.host
+// window.isEnablePenetrationMode ? '/api/9023/'
 let host = '192.168.31.233'
 // 创建axios实例
 export const http = axios.create({
     // axios中请求配置有baseURL选项，表示请求URL公共部分
     // baseURL: 'http://10.243.1.200:9022/',
-    baseURL: `http://${host}:9022/`,
-    // 超时
-    timeout: 20000
+    baseURL: window.isEnablePenetrationMode ? '/api/9022/' : `http://${window.PROJECT_URL}:9022/`,
 })
 
 export const userManagementApi = axios.create({
-    baseURL: `http://${host}:9021/`, //用户管理页面
+    baseURL: window.isEnablePenetrationMode ? '/api/9021/' : `http://${window.PROJECT_URL}:9021/`, //用户管理页面
     // baseURL: 'http://10.243.1.200:9021/', //用户管理页面
 })
-
+export const userManagementUrl = window.isEnablePenetrationMode ? '/api/9021/' : `http://${window.PROJECT_URL}:9021/`
 
 export const facilityManagementApi = axios.create({
         // baseURL: 'http://10.243.1.200:9024/', //设施管理页面
-        baseURL: `http://${host}:9024/`, //设施管理页面
+        baseURL: window.isEnablePenetrationMode ? '/api/9024/' : `http://${window.PROJECT_URL}:9024/`, //设施管理页面
     })
     // export const facilityManagementUrl = 'http://10.243.1.200:9024/'
-export const facilityManagementUrl = `http://${host}:9024/`
+export const facilityManagementUrl = window.isEnablePenetrationMode ? '/api/9024/' : `http://${window.PROJECT_URL}:9024/`
 
 export const operationManagementApi = axios.create({
         // baseURL: 'http://10.243.1.200:9025/', //运行管理页面
-        baseURL: `http://${host}:9025/`, //运行管理页面
+        baseURL: window.isEnablePenetrationMode ? '/api/9025/' :  `http://${window.PROJECT_URL}:9025/`, //运行管理页面
     })
     // export const operationManagementWs = 'ws://10.243.1.200:9025/'
-export const operationManagementWs = `ws://${host}:9025/`
+export const operationManagementWs = window.isEnablePenetrationMode ? '/ws/9025/' : `ws://${window.PROJECT_URL}:9025/`
 
 //人员定位
 export const personnelPositionApi = axios.create({
-    baseURL: `http://${host}:9030/`,
+    baseURL: window.isEnablePenetrationMode ? '/api/9030/' : `http://${window.PROJECT_URL}:9030/`,
     // baseURL: 'http://10.243.1.200:9030/',
 })
-export const personnelPositionWs = `ws://${host}:9030/`;
+export const personnelPositionWs = window.isEnablePenetrationMode ? '/ws/9030/' : `ws://${window.PROJECT_URL}:9030/`;
 // export const personnelPositionWs = 'ws://10.243.1.200:9030/';
+
+// let obj = {
+    
+// }
+// export function get(instantiation,url,params) {
+//     return new Promise((resolve,reject) => {
+//         instantiation.get(url,{
+//             params
+//         }).then(res => {
+//             resolve(res.data)
+//         }).catch( err => {
+//             reject(err.data)
+//         })
+//     })
+// }
+// export function post(instantiation,url,params) {
+//     return new Promise((resolve,reject) => {
+//         instantiation.post(url,params)
+//         .then(res => {
+//             resolve(res.data)
+//         }).catch( err => {
+//             reject(err.data)
+//         })
+//     })
+// }

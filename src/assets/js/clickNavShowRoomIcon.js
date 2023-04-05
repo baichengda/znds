@@ -111,7 +111,7 @@ class showRoomIconIcon extends Autodesk.Viewing.Extension {
                         var $label = $(`
                             <label class="showRoomIcon-markup" style="width:1px" data-id="${_dbid}" data-name="${room_name}" data-modeltype="${icon.modelId}"
                             data-roomid="${room_id}">
-                                <div class="xitong-icons" style="position: absolute;bottom: 0;left: -30px;width: auto;white-space: nowrap;">
+                                <div class="xitong-icons" id="room_${_dbid}_${icon.modelId}" style="position: absolute;bottom: 0;left: -30px;width: auto;white-space: nowrap;">
                                     <div style="position: absolute;left:0;bottom: 100px;width: auto;white-space: nowrap;z-index:2">
                                     ${btnData.map(item => `
                                         <div class="room-real-data">${item.variable_name}:${(item?.value*1).toFixed(1)}</div>

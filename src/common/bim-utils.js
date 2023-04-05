@@ -1,12 +1,12 @@
 import emitter from '@/common/mybus.ts'
 import { ElMessage } from 'element-plus'
-
+import {http} from '@/common/request.js'
 
 //默认视角
-export function defaultView(viewer, data, e) {
+export function defaultView(data, e) {
     try {
         if (!e) {
-            window.yst_viewer = viewer || window.yst_viewer
+            // window.yst_viewer = viewer || window.yst_viewer
             window?.yst_viewer?.clearSelection()
             window?.yst_viewer?.autocam?.goToView({
                 position: new THREE.Vector3(
@@ -28,7 +28,7 @@ export function defaultView(viewer, data, e) {
                 isOrtho: true,
             });
         } else {
-            window.yst_viewer = viewer || window.yst_viewer
+            // window.yst_viewer = viewer || window.yst_viewer
             window?.yst_viewer?.clearSelection()
             window?.yst_viewer?.autocam?.goToView({
                 position: new THREE.Vector3(
@@ -59,22 +59,19 @@ export function defaultView(viewer, data, e) {
 //隐藏房间遮罩
 export function goHideRoomMask() {
     //获取建筑模型数据，以及dbid并隐藏房间
-    let modelcount = window.yst_viewer?.impl.modelQueue().getModels();
+    let modelcount = window.yst_viewer?.impl?.modelQueue()?.getModels();
     // setTimeout(()=>{
-    // console.log(window['models' + 1].getInstanceTree)
-    modelcount.forEach((model) => {
+    modelcount?.forEach((model) => {
         let getJZData = buildModelTree(model).children || [];
         let roomData = getJZData?.filter(item => item.name === "房间")
         // roomData[0].children.forEach(ele => {
         //     let arr = JSON.parse(JSON.stringify([ele.dbId]));
         //     window.yst_viewer?.impl?.visibilityManager.hide(arr,window.JZmodels);
         // });
-        // console.log(window['models' + 1])
-        // console.log(roomData)
         window.yst_viewer?.impl?.visibilityManager.hide(roomData.children, model);
         if (roomData.length) {
             roomData[0].children.forEach(item => {
-                model.visibilityManager.setNodeOff(item.dbId, true);//使用此方法将构件彻底隐藏，但切换页面显示所有时需要单独再将其设置为false，才能显示
+                model?.visibilityManager.setNodeOff(item.dbId, true);//使用此方法将构件彻底隐藏，但切换页面显示所有时需要单独再将其设置为false，才能显示
             })
         }
     })
@@ -175,7 +172,7 @@ export function cutPlanModel(modelId, bottom, top, roomDbids, sname, routerName 
     let top1 = (top - 800) * 0.0032808;
     let bottom1 = bottom * 0.0032808;
     roomDbids && roomDbids.forEach(item => {
-        window['models' + modelId].visibilityManager.setNodeOff(item.dbId, true);//使用此方法将构件彻底隐藏，但切换页面显示所有时需要单独再将其设置为false，才能显示
+        window['models' + modelId]?.visibilityManager?.setNodeOff(item?.dbId || item?.objectId, true);//使用此方法将构件彻底隐藏，但切换页面显示所有时需要单独再将其设置为false，才能显示
     })
     // showAllModel() //剖切前显示所有模型
     let GobalOffset1 = window['models' + modelId]?.getData().globalOffset;
@@ -191,7 +188,7 @@ export function cutPlanModel(modelId, bottom, top, roomDbids, sname, routerName 
 
 /* 显示所有模型 */
 export function showAllModel() {
-    window?.yst_viewer?.clearSelection()
+    // window?.yst_viewer?.clearSelection()
     let visibleModels = window.yst_viewer?.getVisibleModels() || []
     let hiddenModels = window.yst_viewer?.getHiddenModels() || []
     let allModels = [...visibleModels, ...hiddenModels]
@@ -294,5 +291,18 @@ export function hideOtherModal(modelId, dbIds) {
             model.setAllVisibility(false);
             // window.yst_viewer?.hideModel(model)
         }
+    })
+}
+//获取楼层信息，标高
+export function getFloorInfo(objectId,modelId) {
+    if(!objectId && !modelId) return 
+    return new Promise((resolve) => {
+        let formData = new FormData();
+        formData.append('dbId',objectId)
+        formData.append('modelId',modelId)
+        http.post("modelTree/alarmbydevice",formData)
+        .then((res) => {
+            resolve(res.data.data)
+        })
     })
 }
